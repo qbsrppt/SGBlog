@@ -1,5 +1,7 @@
 package com.sangeng.job;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.sangeng.domain.entity.Article;
 import com.sangeng.service.ArticleService;
 import com.sangeng.utils.RedisCache;
@@ -20,17 +22,17 @@ public class UpdateViewCountJob {
     @Autowired
     private ArticleService articleService;
 
-    @Scheduled(cron = "0/55 * * * * ?")
+    @Scheduled(cron = "0 0/10 * * * ?")//每10分钟执行一次
     public void updateViewCount(){
         //获取redis中的浏览量
         Map<String, Integer> viewCountMap = redisCache.getCacheMap("article:viewCount");
 
-        List<Article> articles = viewCountMap.entrySet()
-                .stream()
-                .map(entry -> new Article(Long.valueOf(entry.getKey()), entry.getValue().longValue()))
-                .collect(Collectors.toList());
-        //更新到数据库中
-        articleService.updateBatchById(articles);
+        //更新数据库
+        List<Article> articles = viewCountMap.entrySet().stream().map(item -> new Article(Long.valueOf(item.getKey()), Long.valueOf(item.getValue()))).collect(Collectors.toList());
+        for (Article article : articles) {
+            LambdaUpdateWrapper<Article> wrapper = Wrappers.lambdaUpdate(Article.class).eq(Article::getId, article.getId()).set(Article::getViewCount, article.getViewCount());
+            articleService.update(wrapper);
+        }
 
     }
 }
