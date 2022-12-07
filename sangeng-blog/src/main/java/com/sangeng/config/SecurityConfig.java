@@ -34,30 +34,33 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                //关闭csrf
+                //1.关闭csrf
                 .csrf().disable()
-                //不通过Session获取SecurityContext
+                //2.不通过Session获取SecurityContext
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
+                //3.配置运行匿名访问的接口、需要登陆后才能访问的接口、不需要认证即可访问的接口
                 // 对于登录接口 允许匿名访问
                 .antMatchers("/login").anonymous()
-                //注销接口需要认证才能访问
+                //注销接口需要认证才能访问  user/userInfo接口也需要登陆后才能访问
                 .antMatchers("/logout").authenticated()
                 .antMatchers("/user/userInfo").authenticated()
+                //发表评论的接口需要需要认证才能访问
+                .antMatchers("/comment").authenticated()
 //                .antMatchers("/upload").authenticated()
                 // 除上面外的所有请求全部不需要认证即可访问
                 .anyRequest().permitAll();
 
-        //配置异常处理器
+        //4.配置异常处理器
         http.exceptionHandling()
                 .authenticationEntryPoint(authenticationEntryPoint)
                 .accessDeniedHandler(accessDeniedHandler);
-        //关闭默认的注销功能
+        //5.关闭默认的注销功能
         http.logout().disable();
-        //把jwtAuthenticationTokenFilter添加到SpringSecurity的过滤器链中
+        //6.把jwtAuthenticationTokenFilter添加到SpringSecurity的过滤器链中
         http.addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
-        //允许跨域
+        //7.允许跨域
         http.cors();
     }
 
