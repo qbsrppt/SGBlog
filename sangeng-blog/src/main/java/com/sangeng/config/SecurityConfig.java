@@ -48,6 +48,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user/userInfo").authenticated()
                 //发表评论的接口需要需要认证才能访问
                 .antMatchers("/comment").authenticated()
+                //头像上传接口理论上需要认证才能访问，但前端调用时没携带token过来，没办法只能将这个接口设置为不需要认证才能访问
 //                .antMatchers("/upload").authenticated()
                 // 除上面外的所有请求全部不需要认证即可访问
                 .anyRequest().permitAll();

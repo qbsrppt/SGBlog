@@ -11,13 +11,16 @@ import com.qiniu.util.Auth;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.stereotype.Component;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
 @SpringBootTest(classes = SanGengBlogApplication.class)
-@ConfigurationProperties(prefix = "oss")
+@Component//解决@ConfigurationProperties(prefix = "oss")爆红的问题(不会影响使用)
+@ConfigurationProperties(prefix = "oss")//读取配置文件中的oss下的各个属性并赋值给本类中的各个属性
 public class OSSTest {
-
+    //2.读取配置文件中的啊牛云的ak，sk，空间名称信息
     private String accessKey;
     private String secretKey;
     private String bucket;
@@ -34,9 +37,10 @@ public class OSSTest {
         this.bucket = bucket;
     }
 
+    //测试文件上传
     @Test
     public void testOss(){
-        //构造一个带指定 Region 对象的配置类
+        //1.构造一个带指定 Region 对象的配置类
         Configuration cfg = new Configuration(Region.autoRegion());
         //...其他参数参考类注释
 
@@ -46,21 +50,22 @@ public class OSSTest {
 //        String secretKey = "your secret key";
 //        String bucket = "sg-blog";
 
-        //默认不指定key的情况下，以文件内容的hash值作为文件名
+        //3.定义存储到服务器上的文件名称（设置为null的话，则会以文件内容的hash值作为文件名）
         String key = "2022/sg.png";
 
         try {
 //            byte[] uploadBytes = "hello qiniu cloud".getBytes("utf-8");
 //            ByteArrayInputStream byteInputStream=new ByteArrayInputStream(uploadBytes);
 
-
-            InputStream inputStream = new FileInputStream("C:\\Users\\root\\Desktop\\Snipaste_2022-02-28_22-48-37.png");
+            //4.定义文件路径
+            InputStream inputStream = new FileInputStream("C:\\Users\\WYJ\\Desktop\\111.png");
             Auth auth = Auth.create(accessKey, secretKey);
             String upToken = auth.uploadToken(bucket);
 
             try {
+                //5.进行文件上传
                 Response response = uploadManager.put(inputStream,key,upToken,null, null);
-                //解析上传成功的结果
+                //6.解析上传成功的结果
                 DefaultPutRet putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
                 System.out.println(putRet.key);
                 System.out.println(putRet.hash);

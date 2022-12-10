@@ -27,8 +27,13 @@ mybatis-plus:
       logic-not-delete-value: 0
       id-type: auto
 
-#配置阿里云
+#配置七牛云
 oss:
-  accessKey: daddasd
-  secretKey: weqeqwe
-  bucket: sg-blog
+  # 配置七牛云中的密钥管理中的ak
+  accessKey: HrGBddHak-1ywywS5IFdnFbFYhOByUyvYnkMdt07
+  #配置七牛云中的密钥管理中的sk
+  secretKey: J2cVtMG0BEhB9zTJrk96CcOYjGaptKh_2VuIDiMP
+  #配置七牛云上设置的空间名称
+  bucket: jyw-blog
+  #配置七牛云的访问地址
+  urlLcation: http://rmktq8jpn.bkt.clouddn.com/
