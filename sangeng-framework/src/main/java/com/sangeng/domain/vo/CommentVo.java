@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+//根评论和二级评论都用这个类封装
 public class CommentVo {
     private Long id;
     //文章id
@@ -18,12 +19,12 @@ public class CommentVo {
     private Long rootId;
     //评论内容
     private String content;
-    //所回复的目标评论的userid
+    //所回复的目标评论的用户id
     private Long toCommentUserId;
     private String toCommentUserName;
     //回复目标评论id
     private Long toCommentId;
-
+    //创建当前评论内容的用户id
     private Long createBy;
 
     private Date createTime;

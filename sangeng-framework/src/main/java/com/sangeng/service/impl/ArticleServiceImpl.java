@@ -18,7 +18,6 @@ import com.sangeng.service.CategoryService;
 import com.sangeng.utils.BeanCopyUtils;
 import com.sangeng.utils.RedisCache;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -59,6 +58,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 //            BeanUtils.copyProperties(article,vo);
 //            articleVos.add(vo);
 //        }
+        //从redis中获取viewCount
+        for (Article article : articles) {
+            Long id = article.getId();
+            Integer viewCount = redisCache.getCacheMapValue("article:viewCount", id.toString());
+            article.setViewCount(viewCount.longValue());
+        }
         List<HotArticleVo> vs = BeanCopyUtils.copyBeanList(articles, HotArticleVo.class);
         return ResponseResult.okResult(vs);
     }
@@ -89,7 +94,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 //            article.setCategoryName(category.getName());
 //        }
 
-
+        //从redis中获取viewCount
+        for (Article article : articles) {
+            Long id = article.getId();
+            Integer viewCount = redisCache.getCacheMapValue("article:viewCount", id.toString());
+            article.setViewCount(viewCount.longValue());
+        }
         //封装查询结果
         List<ArticleListVo> articleListVos = BeanCopyUtils.copyBeanList(page.getRecords(), ArticleListVo.class);
 
