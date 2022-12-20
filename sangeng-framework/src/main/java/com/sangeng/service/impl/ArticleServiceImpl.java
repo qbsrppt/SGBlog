@@ -22,7 +22,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -142,7 +144,10 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         //添加 博客
         Article article = BeanCopyUtils.copyBean(articleDto, Article.class);
         save(article);
-
+        //将博客浏览量添加到redis中(刚添加时，浏览量为0)
+        Map<String, Integer> viewCountMap = new HashMap<>();
+        viewCountMap.put(article.getId().toString(),0);
+        redisCache.setCacheMap("article:viewCount",viewCountMap);
 
         List<ArticleTag> articleTags = articleDto.getTags().stream()
                 .map(tagId -> new ArticleTag(article.getId(), tagId))
@@ -193,6 +198,10 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Override
     public void edit(ArticleDto articleDto) {
         Article article = BeanCopyUtils.copyBean(articleDto, Article.class);
+        //从redis中获取viewCount
+        Long id = article.getId();
+        Integer viewCount = redisCache.getCacheMapValue("article:viewCount", id.toString());
+        article.setViewCount(viewCount.longValue());
         //更新博客信息
         updateById(article);
         //删除原有的 标签和博客的关联

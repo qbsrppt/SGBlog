@@ -18,7 +18,7 @@ public class PermissionService {
         if(SecurityUtils.isAdmin()){
             return true;
         }
-        //否则  获取当前登录用户所具有的权限列表 如何判断是否存在permission
+        //否则若为其它用户,  则获取当前登录用户所具有的权限列表 如何判断是否存在permission
         List<String> permissions = SecurityUtils.getLoginUser().getPermissions();
         return permissions.contains(permission);
     }
